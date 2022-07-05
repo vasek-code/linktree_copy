@@ -1,5 +1,5 @@
 {
-  "name": ".",
+  "name": "linktree_copy",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -10,11 +10,16 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@chakra-ui/react": "^2.2.1",
+    "@emotion/react": "^11.9.3",
+    "@emotion/styled": "^11.9.3",
+    "@fontsource/inter": "^4.5.11",
     "@prisma/client": "^4.0.0",
     "@trpc/client": "^9.25.3",
     "@trpc/next": "^9.25.3",
     "@trpc/react": "^9.25.3",
     "@trpc/server": "^9.25.3",
+    "framer-motion": "^6.4.1",
     "next": "12.2.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",

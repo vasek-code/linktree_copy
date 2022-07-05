@@ -2,9 +2,17 @@ import { withTRPC } from "@trpc/next";
 import type { AppRouter } from "../server/router";
 import type { AppType } from "next/dist/shared/lib/utils";
 import superjson from "superjson";
+import { ChakraProvider } from "@chakra-ui/react";
+import { theme } from "../chakra/config";
+
+import "../styles/globals.css";
 
 const MyApp: AppType = ({ Component, pageProps }) => {
-  return <Component {...pageProps} />;
+  return (
+    <ChakraProvider theme={theme}>
+      <Component {...pageProps} />
+    </ChakraProvider>
+  );
 };
 
 const getBaseUrl = () => {
@@ -26,5 +34,5 @@ export default withTRPC<AppRouter>({
       transformer: superjson,
     };
   },
-  ssr: false,
+  ssr: true,
 })(MyApp);

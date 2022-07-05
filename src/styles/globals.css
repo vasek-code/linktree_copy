@@ -1,0 +1,8 @@
+* {
+  font-family: "Segoe UI" !important;
+}
+
+input::placeholder {
+  color: rgb(200, 200, 200);
+  font-weight: 500;
+}

@@ -4,14 +4,17 @@ import type { AppType } from "next/dist/shared/lib/utils";
 import superjson from "superjson";
 import { ChakraProvider } from "@chakra-ui/react";
 import { theme } from "../chakra/config";
+import { CookiesProvider } from "react-cookie";
 
 import "../styles/globals.css";
 
 const MyApp: AppType = ({ Component, pageProps }) => {
   return (
-    <ChakraProvider theme={theme}>
-      <Component {...pageProps} />
-    </ChakraProvider>
+    <CookiesProvider>
+      <ChakraProvider theme={theme}>
+        <Component {...pageProps} />
+      </ChakraProvider>
+    </CookiesProvider>
   );
 };
 

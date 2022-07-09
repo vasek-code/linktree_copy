@@ -9,26 +9,38 @@ import Router from "next/router";
 import { Loader } from "../components/Loader";
 import { useCookies } from "react-cookie";
 
-const LoginPage: NextPage = () => {
+const SignUpPage: NextPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
   const [cookies, setCookie] = useCookies(["token"]);
 
   const [validationError, setValidationError] = useState(
-    new Map<String, String>().set("username", "").set("password", "")
+    new Map<String, String>()
+      .set("email", "")
+      .set("username", "")
+      .set("password", "")
   );
+
+  const [errorMessage, setErrorMessage] = useState("");
 
   const userByUsernameMutation = trpc.useMutation(["user.by-username"]);
 
-  const userLoginMutation = trpc.useMutation(["user.login"], {
+  const userCreateMutation = trpc.useMutation(["user.create"], {
     onSuccess: async () => {
       setValidationError(
-        new Map<String, String>().set("username", "").set("password", "")
+        new Map<String, String>()
+          .set("username", "")
+          .set("password", "")
+          .set("email", "")
       );
     },
     onError: async (error) => {
       setValidationError(
-        new Map<String, String>().set("username", "").set("password", "")
+        new Map<String, String>()
+          .set("email", "")
+          .set("username", "")
+          .set("password", "")
       );
 
       let parsedError = null;
@@ -52,12 +64,12 @@ const LoginPage: NextPage = () => {
         username,
       });
 
-      if (!exists) {
+      if (exists) {
         setValidationError(
           (prev) =>
             new Map([
               ...prev,
-              ["username", `The username "${username}" doesn't exist`],
+              ["username", `The username "${username}" is already taken.`],
             ])
         );
       }
@@ -65,7 +77,11 @@ const LoginPage: NextPage = () => {
   });
 
   async function handleSubmit() {
-    const user = await userLoginMutation.mutateAsync({ password, username });
+    const user = await userCreateMutation.mutateAsync({
+      password,
+      username,
+      email,
+    });
 
     if (user.token) {
       setCookie("token", user.token, { path: "/" });
@@ -110,7 +126,7 @@ const LoginPage: NextPage = () => {
           <Flex maxW="600px" w="100%" flexDir="column" pb="200px">
             <Flex w="100%" pb="50px">
               <Text fontSize="48px" fontWeight="800" letterSpacing="-2px">
-                Log in to your Linktree
+                Create an account for free
               </Text>
             </Flex>
 
@@ -141,7 +157,34 @@ const LoginPage: NextPage = () => {
                 </Text>
               )}
             </Flex>
-            <Flex w="100%" pb="50px" flexDir="column" gap="9px">
+            <Flex w="100%" pb="0.7rem" flexDir="column" gap="9px">
+              <Input
+                background="#252525"
+                w="100%"
+                h="45px"
+                placeholder="Email"
+                border={validationError.get("email") && "2px solid #cd3740"}
+                borderColor={validationError.get("email") && "#cd3740"}
+                _hover={{
+                  border: "1px solid gray",
+                }}
+                _focusVisible={{
+                  border: "2px solid gray",
+                }}
+                fontWeight="semibold"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                }}
+                type="email"
+              />
+              {validationError.get("email") && (
+                <Text pl="5px" fontWeight="semibold" color="#cd3740">
+                  {validationError.get("email")}
+                </Text>
+              )}
+            </Flex>
+            <Flex w="100%" flexDir="column" gap="9px" pb="50px">
               <Input
                 background="#252525"
                 w="100%"
@@ -168,8 +211,9 @@ const LoginPage: NextPage = () => {
                 </Text>
               )}
             </Flex>
+
             <Flex w="100%" pb="35px">
-              {userLoginMutation.isLoading ? (
+              {userCreateMutation.isLoading ? (
                 <IconButton
                   aria-label="loading"
                   icon={
@@ -190,22 +234,14 @@ const LoginPage: NextPage = () => {
                   borderRadius="64px"
                   onClick={handleSubmit}
                 >
-                  Log In
+                  Sign up with email
                 </Button>
               )}
             </Flex>
             <Flex w="100%" justify="center" pb="35px">
-              <Button variant="link" fontWeight="semibold" color="white">
-                Forgot password?
-              </Button>
-            </Flex>
-            <Flex w="100%" justify="center" gap="5px">
-              <Text fontWeight="semibold" color="gray.300">
-                Don&apos;t have a Linktree account?
-              </Text>
-              <Link href="/signup">
-                <Button variant="link" color="white">
-                  Create One
+              <Link href="/login">
+                <Button variant="link" fontWeight="semibold" color="white">
+                  Already have an account?
                 </Button>
               </Link>
             </Flex>
@@ -217,4 +253,4 @@ const LoginPage: NextPage = () => {
   );
 };
 
-export default LoginPage;
+export default SignUpPage;

@@ -5,6 +5,7 @@ import superjson from "superjson";
 import { ChakraProvider } from "@chakra-ui/react";
 import { theme } from "../chakra/config";
 import { CookiesProvider } from "react-cookie";
+import { ReactQueryDevtools } from "react-query/devtools";
 
 import "../styles/globals.css";
 
@@ -14,6 +15,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
       <ChakraProvider theme={theme}>
         <Component {...pageProps} />
       </ChakraProvider>
+      <ReactQueryDevtools />
     </CookiesProvider>
   );
 };
@@ -30,11 +32,24 @@ const getBaseUrl = () => {
 
 export default withTRPC<AppRouter>({
   config({ ctx }) {
+    if (typeof window !== "undefined") {
+      return {
+        transformer: superjson,
+        url: "/api/trpc",
+      };
+    }
+
     const url = `${getBaseUrl()}/api/trpc`;
 
     return {
       url,
       transformer: superjson,
+      headers() {
+        return {
+          cookie: ctx?.req?.headers.cookie,
+          "x-ssr": "1",
+        };
+      },
     };
   },
   ssr: true,

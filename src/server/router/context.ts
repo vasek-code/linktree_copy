@@ -9,7 +9,11 @@ export const createContext = (opts?: trpcNext.CreateNextContextOptions) => {
   const req = opts?.req;
   const res = opts?.res;
 
-  const user = jwt.verify(req?.cookies.token as string, process.env.JWT_SECRET as string) as User
+  let user = null
+
+  if (req?.cookies.token) {
+    user = jwt.verify(req?.cookies.token as string, process.env.JWT_SECRET as string) as User
+  }
 
   return {
     req,

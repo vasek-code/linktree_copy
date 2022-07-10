@@ -48,17 +48,26 @@ const LoginPage: NextPage = () => {
         );
       });
 
-      const exists = await userByUsernameMutation.mutateAsync({
-        username,
-      });
+      try {
+        const exists = await userByUsernameMutation.mutateAsync({
+          username,
+        });
 
-      if (!exists) {
+        if (!exists) {
+          setValidationError(
+            (prev) =>
+              new Map([
+                ...prev,
+                ["username", `The username "${username}" doesn't exist`],
+              ])
+          );
+        }
+      } catch (e) {}
+
+      if (error.message === "Bad password") {
         setValidationError(
           (prev) =>
-            new Map([
-              ...prev,
-              ["username", `The username "${username}" doesn't exist`],
-            ])
+            new Map([...prev, ["password", `Please enter valid password`]])
         );
       }
     },
@@ -68,8 +77,8 @@ const LoginPage: NextPage = () => {
     const user = await userLoginMutation.mutateAsync({ password, username });
 
     if (user.token) {
-      setCookie("token", user.token, { path: "/" });
-      Router.push("/");
+      setCookie("token", user.token, { path: "*" });
+      Router.push(`/${username}`);
     }
   }
 

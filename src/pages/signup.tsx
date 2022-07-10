@@ -60,19 +60,21 @@ const SignUpPage: NextPage = () => {
         );
       });
 
-      const exists = await userByUsernameMutation.mutateAsync({
-        username,
-      });
+      try {
+        const exists = await userByUsernameMutation.mutateAsync({
+          username,
+        });
 
-      if (exists) {
-        setValidationError(
-          (prev) =>
-            new Map([
-              ...prev,
-              ["username", `The username "${username}" is already taken.`],
-            ])
-        );
-      }
+        if (exists) {
+          setValidationError(
+            (prev) =>
+              new Map([
+                ...prev,
+                ["username", `The username "${username}" is already taken.`],
+              ])
+          );
+        }
+      } catch (e) {}
     },
   });
 
@@ -84,8 +86,8 @@ const SignUpPage: NextPage = () => {
     });
 
     if (user.token) {
-      setCookie("token", user.token, { path: "/" });
-      Router.push("/");
+      setCookie("token", user.token, { path: "*" });
+      Router.push(`/${username}`);
     }
   }
 
